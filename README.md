@@ -1,9 +1,8 @@
-# Learning Platform "Study Bar" Data Mining Report
+# 學習平台「學習吧」資料探勘報告
+### 團隊名稱：Research Home
+### 議題：學習吧國小1至6年級總體及各群體的學習表現概況
 
-### Team Name: Research Home
-### Topic: Overview of Overall and Grouped Learning Performance of Elementary School Students (Grades 1-6) on Study Bar
-
-> Authors: 
+> 撰寫人：柯亮宇、洪明凱
 
 ---
 
@@ -11,135 +10,480 @@
 
 ---
 
-## 1. Topic Description
+## 一、議題說明
+### （一）遇到的問題
+隨著科技的發展，有越來越多的學校融入線上教學平台來輔助學生學習，學習吧也就是其中一個線上學習平台。但線上學習平台對學生學習的影響有多大呢？
 
-### (1) Problems Encountered
+- 學習吧資料缺乏整理，難以看出總體趨勢或是使用者的習慣
+- 資料沒有使用者的年級或是性別
+- 從現有資料欄位可能難以將使用情形與學習成效做連結
 
-With the advancement of technology, more and more schools are integrating online learning platforms to assist students in their studies. Study Bar is one such online learning platform. But how significant is its impact on student learning?
+### （二）解決方法
 
-- Study Bar data lacks organization, making it difficult to identify overall trends or user habits.
-- The data does not include user grade levels or gender.
-- Existing data fields may not effectively link usage patterns with learning outcomes.
+透過進一步處理及分析學習吧平台的使用者學習資料，了解更多無法從零散數據中獲得的探索，找出不同使用者對於線上學習平台的需求。
 
-### (2) Solutions
+- 可視化總體的資料，觀察資料的特徵
+- 依照不同月份，不同年級或性別的資料來進行分組
+- 使用機器分群的方式分出不同習性的使用者，並進一步探討群集間的差異
 
-By further processing and analyzing user learning data from the Study Bar platform, we aim to uncover insights that cannot be obtained from scattered data, identifying different user needs for online learning platforms.
+## 二、動機
+執行不同的資料處理及分析，從資料探勘中找出隱藏在資料中有用的資訊
+- 協助教師了解學生使用平台的時機、方式，以獲得平台課程微調方向
+- 了解學生對於平台的使用意願，以及如何使用平台來幫助自己學習
+- 期許為開發商提供新的角度，參考分析結果來看學習平台，為使用者帶來更個人化的課程或是更貼近學生需求的使用者體驗
 
-- Visualizing overall data to observe its characteristics.
-- Grouping data by different months, grade levels, or gender.
-- Using machine clustering to segment users based on behavior and explore differences between clusters.
+## 三、數據準備與處理
+### 欄位說明
 
-## 2. Motivation
+數據來自於6個分開的CSV檔案，有5個學習吧平台不同月份的學習資料，和學生的資料表，我們先將學習吧資料Concat起來，再用學習吧資料和學生的資料共同的Student ID，使用Inner join的方式將學生資料加到學習吧資料中。
 
-By implementing various data processing and analysis techniques, we aim to discover hidden valuable information from data mining.
 
-- Help teachers understand when and how students use the platform to optimize course adjustments.
-- Gain insights into student willingness to use the platform and how they leverage it for learning.
-- Provide new perspectives for developers to enhance personalization and user experience on the learning platform.
+以下是整理過後的 CSV 檔案欄位描述：
 
-## 3. Data Preparation and Processing
+| 欄位名稱           | 描述                          | 範例數值               |
+|--------------------|-------------------------------|------------------------|
+| stuid              | 使用者流水號，唯一標識學生身份 | 164999                 |
+| gender                | 學生性別                      | 生理男 / 生理女        |
+| birth              | 出生日期                      | 1970-01-01 00:00:00    |
+| 在線時間            | 累計在線時間（秒）            | 25821.0                |
+| 素材總使用時間   | 當月總使用素材時間（秒）      | 4874.0                 |
+| 課程名稱            | 學生當月的課程名稱                      | 112學年度 六上 英語作業 |
+| 瀏覽影片時間     | 當月瀏覽影片時間（秒）        | 2274.0                 |
+| 影片加總時間        | 總影片觀看時間（秒）          | 4823.0                 |
+| 測驗時間        | 當月測驗花費時間（秒）        | 0.0                    |
+| 測驗加總時間        | 測驗總時間（秒）              | 24.0                   |
+| 語音作業時間     | 當月語音作業時間（秒）        | 0.0                    |
+| 語音作業加總時間     | 語音作業總時間（秒）          | 0.0                    |
+| 音檔時間        | 當月使用音檔時間（秒）        | 0.0                    |
+| 音檔加總時間        | 音檔使用總時間（秒）          | 0.0                    |
+| month              | 資料紀錄月份                  | 2                      |
+| grade              | 照生日得到學生年級                      | 1                      |
+| courseCategory     | 照課程名稱的課程類別                      | 英語                    |
 
-### Field Descriptions
 
-The data comes from six separate CSV files, consisting of five months of Study Bar platform learning records and a student information table. We first concatenate the Study Bar data and then use an inner join on the common `Student ID` field to merge student data.
+後續為了方便製圖，所以又再將資料進行整併，以stuid來分組資料：
+| 欄位名稱           | 描述                          | 範例數值               |
+|--------------------|-------------------------------|------------------------|
+| stuid              | 使用者流水號，唯一標識學生身份 | 164999                 |
+| gender                | 學生性別                      | 生理男 / 生理女        |
+| birth              | 出生日期                      | 1970-01-01 00:00:00    |
+| 在線時間            | 2到6月累計在線時間（秒）            | 25821.0                |
+| 素材總使用時間   | 2到6月總使用素材時間（秒）      | 4874.0                 |
+| 課程名稱            | 學生2到6月的課程名稱(list)                      | ["112學年度 六上 英語作業"] |
+| 瀏覽影片時間     | 2到6月瀏覽影片時間（秒）        | 2274.0                 |
+| 影片加總時間        | 2到6月總影片觀看時間（秒）          | 4823.0                 |
+| 測驗時間        | 2到6月測驗花費時間（秒）        | 0.0                    |
+| 測驗加總時間        | 2到6月測驗總時間（秒）              | 24.0                   |
+| 語音作業時間     | 2到6月語音作業時間（秒）        | 0.0                    |
+| 語音作業加總時間     | 2到6月語音作業總時間（秒）          | 0.0                    |
+| 音檔時間        | 2到6月使用音檔時間（秒）        | 0.0                    |
+| 音檔加總時間        | 2到6月音檔使用總時間（秒）          | 0.0                    |
 
-Here is a description of the cleaned CSV fields:
 
-| Field Name       | Description                      | Example Value            |
-|-----------------|---------------------------------|-------------------------|
-| `stuid`         | Unique student identifier       | 164999                  |
-| `gender`        | Student gender                  | Male / Female           |
-| `birth`         | Date of birth                    | 1970-01-01 00:00:00     |
-| `online_time`   | Total accumulated online time (seconds) | 25821.0                |
-| `material_time` | Total material usage time (seconds) | 4874.0                 |
-| `course_name`   | Course name for the month      | "112 Academic Year English Homework" |
-| `video_time`    | Video browsing time (seconds)  | 2274.0                  |
-| `total_video_time` | Total video watching time (seconds) | 4823.0              |
-| `quiz_time`     | Quiz time spent (seconds)      | 0.0                      |
-| `total_quiz_time` | Total quiz time (seconds)     | 24.0                     |
-| `speech_time`   | Speech assignment time (seconds) | 0.0                     |
-| `total_speech_time` | Total speech assignment time (seconds) | 0.0             |
-| `audio_time`    | Audio file usage time (seconds) | 0.0                     |
-| `total_audio_time` | Total audio usage time (seconds) | 0.0                   |
-| `month`         | Data recorded month            | 2                        |
-| `grade`         | Student grade level (inferred from birthdate) | 1 |
-| `courseCategory` | Course category based on course name | English |
 
-To facilitate visualization, the data was further aggregated by grouping by `stuid`:
 
-| Field Name       | Description                      | Example Value            |
-|-----------------|---------------------------------|-------------------------|
-| `stuid`         | Unique student identifier       | 164999                  |
-| `gender`        | Student gender                  | Male / Female           |
-| `birth`         | Date of birth                    | 1970-01-01 00:00:00     |
-| `online_time`   | Accumulated online time (Feb–Jun) | 25821.0                |
-| `material_time` | Total material usage time (Feb–Jun) | 4874.0             |
-| `course_name`   | Course names from Feb–Jun (list) | ["112 Academic Year English Homework"] |
-| `video_time`    | Video browsing time (Feb–Jun)  | 2274.0                  |
-| `total_video_time` | Total video watching time (Feb–Jun) | 4823.0          |
-| `quiz_time`     | Quiz time spent (Feb–Jun)      | 0.0                      |
-| `total_quiz_time` | Total quiz time (Feb–Jun)     | 24.0                     |
-| `speech_time`   | Speech assignment time (Feb–Jun) | 0.0                     |
-| `total_speech_time` | Total speech assignment time (Feb–Jun) | 0.0         |
-| `audio_time`    | Audio file usage time (Feb–Jun) | 0.0                     |
-| `total_audio_time` | Total audio usage time (Feb–Jun) | 0.0                   |
 
-## 4. Analysis Methods and Process
 
-Since Study Bar is mainly an elementary school learning platform, our analysis focuses on elementary students.
+## 四、分析方法與流程
+
+有鑑於我們自己學習吧平台的使用經驗，從網站上的課程（2024/09）來看平台目前主要是國小課程，所以以下我們就將分析的資料限縮在國小學生（使用學生的生日來推論年級）。
 
 ```mermaid
 graph LR
-    A[Data Processing Complete] --> B[Data Merging]
-    B --> C[Results Visualization]
-    C --> D[Report and Conclusion]
+    A[資料處理完成] --> B[資料合併]
+    B --> C[結果可視化]
+    C --> D[報告與結論]
 ```
 
-### Data Processing Steps
+資料處理的流程：
 
-1. **Data Loading**: Load datasets, including student information and multiple months of learning behavior data, clean missing values, and convert time fields into seconds.
-2. **Data Cleaning and Transformation**: Process null values and compute completion rates (e.g., video and speech completion rates).
-3. **Data Merging**: Combine monthly datasets, group by `stuid`, and sum up learning time for each student.
-4. **Data Overview and Analysis**: Use Python visualization tools (e.g., line charts, bar charts, heatmaps) to analyze the data.
+1. **資料載入**：讀取資料集，包括學生基本資訊和多個月份的學習行為數據，從多個來源（如 Google 試算表）讀取並清理數據。
+2. **數據清理與格式轉換**：將時間欄位轉換為秒數格式，處理空值（如 "Null" 和空字串），並計算完成比例（例如，影片和語音完成比例）。
 
-### Clustering Analysis
 
+分析的處理流程：
+1. **資料合併**：合併各月份的資料集，按學生 ID（stuid）進行分組，並加總各學生的學習秒數。
+2. **資料概覽與分析**：使用Python圖表工具，將資料以適合的圖表呈現（如折線圖、柱狀圖、圓餅圖），幫助我們進行分析
+
+另外我們也嘗試使用了分群法來區分出不同的學生：
 ```mermaid
 graph LR
-    A[Data Processing Complete] --> B[Data Merging]
-    B --> C[PCA Dimensionality Reduction]
-    C --> D[K-means Clustering]
+    A[資料處理完成] --> B[資料合併]
+    B --> C[PCA 降維]
+    C --> D[K-means 分群]
     D --> E[One-Hot Encoding]
-    E --> F[Results Visualization]
-    F --> G[Report and Conclusion]
+    E --> F[結果可視化]
+    F --> G[報告與結論]
 ```
 
-1. **PCA (Principal Component Analysis)**: Reduces multidimensional data into principal components to simplify structure and improve visualization.
-2. **K-means Clustering**: Groups students based on learning behavior similarities.
-3. **One-Hot Encoding**: Converts categorical data into numerical format for analysis.
-4. **Results Visualization**: Displays clustering results using 2D scatter plots.
+1. **主成分分析 (PCA)**：對多維度數據進行降維，使用主成分來簡化數據結構，保留數據變異中最重要的部分。這有助於可視化和減少計算複雜性。
+2. **K-means 分群**：使用 K-means 方法將學生分成數個群組。這些群組可能代表具有相似學習行為或使用習慣的學生。
+3.  **One-Hot Encoding**：對學生資料進行 One-Hot Encoding 的主要目的，是將分類資料轉換成數值資料。
+4. **結果可視化**：將分群結果通過 2D 散佈圖來展示 PCA 結果中的各群體分布。
 
-## 5. Initial Results and Expected Benefits
+## 五、初步結果與預期效益
 
-### (1) Overall Student Learning Analysis
 
-#### (1) Total Material Usage Time per Course
+### （一）總體學生學習分析
+
+#### (1) 學生在各課程的素材總使用時間
 
 ![newplot](https://hackmd.io/_uploads/rJkdXlj7ke.png)
+![newplot (1)](https://hackmd.io/_uploads/HJrOmlomkl.png)
+![newplot (2)](https://hackmd.io/_uploads/Sko_QxomJl.png)
 
-1. **Observations**:
-   - Some courses have significantly higher material usage times.
-   - Heatmaps show that courses like "Reading Together" and "Faithful Reading" have noticeably higher engagement.
+1. 圖表說明：
+橫軸表示課程，縱軸代表學生ID，每個顏色深淺的點反映該學生在該課程的素材總使用時間。
 
-2. **Key Takeaways**:
-   - Courses with specific and structured content encourage students to develop habitual learning patterns.
+2. 素材總使用時間分布：
+素材總使用時間在不同課程間的分布不均，某些課程有較高的素材總使用時間。
 
-### (2) Grade and Gender Differences in Learning Behavior
+3. 主要觀察：
+從熱力圖中可以發現，課程「『做伙來』讀課文」和「忠於朗讀」明顯深於其他的課程，這也代表著這兩個課程的素材總使用時間是相對高的。
+
+透過熱力圖，我們發現課程「『做伙來』讀課文」和「忠於朗讀」或許和其他的課程不同，因此我們決定再繼續從課程切入，進一步找出這兩個課程不同於其他課程的地方。
+
+#### (2) 課程「『做伙來』讀課文」和「忠於朗讀」
+<!-- ![newplot (3)](https://hackmd.io/_uploads/SyAQUxjXyx.png) -->
+
+<iframe src="https://data-mining-strong-beignet.netlify.app/1-2-1.html" height="500px" frameborder="0"></iframe>
+
+<!-- ![newplot (4)](https://hackmd.io/_uploads/HkNVUei7kg.png) -->
+
+<iframe src="https://data-mining-strong-beignet.netlify.app/1-2-2.html" height="500px" frameborder="0"></iframe>
+
+1. 圖表說明：
+箱型圖的橫軸表示課程中4種不同的素材類型，縱軸是不同素材的使用秒數。
+
+2. 不同素材類型的分佈：
+兩課程的秒數分佈有很大的區別，「做伙來」讀課文的部分是瀏覽影片的時間較多，而忠於朗讀則是在語音作業上佔了較高的秒數。
+
+3. 主要觀察：
+學生在使用時間較長的課程中，顯示出具針對性且具有自身類別特色的學習內容，能使學生能夠更專注於特定的學習形式。同時，課程結構的穩定性促使學生逐漸養成對該類素材的使用習慣，進而提高使用時間。
+
+<br/>
+
+### （二）年級性別學習差異分析
 
 <iframe src="https://data-mining-strong-beignet.netlify.app/2-1-4.html" height="500px" frameborder="0"></iframe>
 
-| Grade | Material Type | Avg Time (s) | Std Dev (s) | Min Time (s) | Max Time (s) | Median Time (s) | Sample Size |
+| 年級 | 素材類型 | 平均使用時間(秒) | 使用時間標準差(秒) | 最小使用時間(秒) | 最大使用時間(秒) | 中位數使用時間(秒) | 樣本數 |
 |---|---|---|---|---|---|---|---|
-| 1 | Quiz Time | 5.72 | 34.33 | 0.00 | 206.00 | 0.00 | 36 |
-| 1 | Video Time | 74.72 | 172.95 | 0.00 | 739.00 | 0.00 | 36 |
-...
+| 1 | 測驗時間 | 5.72 | 34.33 | 0.00 | 206.00 | 0.00 | 36 |
+| 1 | 瀏覽影片時間 | 74.72 | 172.95 | 0.00 | 739.00 | 0.00 | 36 |
+| 1 | 語音作業時間 | 42.81 | 105.87 | 0.00 | 501.00 | 0.00 | 36 |
+| 1 | 音檔時間 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 36 |
+| 2 | 測驗時間 | 157.23 | 389.36 | 0.00 | 4381.00 | 0.00 | 303 |
+| 2 | 瀏覽影片時間 | 88.29 | 210.19 | 0.00 | 1837.00 | 0.00 | 303 |
+| 2 | 語音作業時間 | 428.60 | 1840.98 | 0.00 | 21593.00 | 0.00 | 303 |
+| 2 | 音檔時間 | 1.10 | 11.06 | 0.00 | 127.00 | 0.00 | 303 |
+| 3 | 測驗時間 | 72.04 | 378.99 | 0.00 | 6640.00 | 0.00 | 918 |
+| 3 | 瀏覽影片時間 | 159.82 | 906.73 | 0.00 | 22929.00 | 0.00 | 918 |
+| 3 | 語音作業時間 | 204.53 | 695.30 | 0.00 | 5797.00 | 0.00 | 918 |
+| 3 | 音檔時間 | 17.52 | 114.71 | 0.00 | 1201.00 | 0.00 | 918 |
+| 4 | 測驗時間 | 37.62 | 156.42 | 0.00 | 2155.00 | 0.00 | 791 |
+| 4 | 瀏覽影片時間 | 442.04 | 1281.85 | 0.00 | 12526.00 | 0.00 | 791 |
+| 4 | 語音作業時間 | 163.13 | 443.65 | 0.00 | 7701.00 | 0.00 | 791 |
+| 4 | 音檔時間 | 0.00 | 0.05 | 0.00 | 1.00 | 0.00 | 791 |
+| 5 | 測驗時間 | 981.29 | 5922.84 | 0.00 | 76256.00 | 0.00 | 989 |
+| 5 | 瀏覽影片時間 | 235.15 | 697.76 | 0.00 | 7425.00 | 0.00 | 989 |
+| 5 | 語音作業時間 | 336.09 | 1514.27 | 0.00 | 16752.00 | 0.00 | 989 |
+| 5 | 音檔時間 | 1.33 | 28.77 | 0.00 | 819.00 | 0.00 | 989 |
+| 6 | 測驗時間 | 444.00 | 2176.36 | 0.00 | 22911.00 | 0.00 | 1005 |
+| 6 | 瀏覽影片時間 | 386.70 | 1757.59 | 0.00 | 46272.00 | 0.00 | 1005 |
+| 6 | 語音作業時間 | 493.06 | 1792.71 | 0.00 | 17675.00 | 0.00 | 1005 |
+| 6 | 音檔時間 | 6.50 | 47.56 | 0.00 | 580.00 | 0.00 | 1005 |
+
+<!-- ![newplot (22)](https://hackmd.io/_uploads/rkX5r5am1e.png) -->
+
+<iframe src="https://data-mining-strong-beignet.netlify.app/2-1-3.html" height="500px" frameborder="0"></iframe>
+
+| 生理性別 | 素材類型 | 平均使用時間(秒) | 使用時間標準差(秒) | 最小使用時間(秒) | 最大使用時間(秒) | 中位數使用時間(秒) | 樣本數 |
+|---|---|---|---|---|---|---|---|
+| 生理女 | 測驗時間 | 449.56 | 3379.17 | 0.00 | 57292.00 | 0.00 | 1994 |
+| 生理女 | 瀏覽影片時間 | 290.41 | 1442.60 | 0.00 | 46272.00 | 0.00 | 1994 |
+| 生理女 | 語音作業時間 | 360.57 | 1537.17 | 0.00 | 21593.00 | 0.00 | 1994 |
+| 生理女 | 音檔時間 | 6.18 | 59.38 | 0.00 | 1201.00 | 0.00 | 1994 |
+| 生理男 | 測驗時間 | 324.24 | 2915.46 | 0.00 | 76256.00 | 0.00 | 2048 |
+| 生理男 | 瀏覽影片時間 | 277.31 | 873.30 | 0.00 | 10372.00 | 0.00 | 2048 |
+| 生理男 | 語音作業時間 | 272.04 | 1097.60 | 0.00 | 17675.00 | 0.00 | 2048 |
+| 生理男 | 音檔時間 | 5.83 | 63.85 | 0.00 | 1108.00 | 0.00 | 2048 |
+
+<br/>
+
+### （三）不同年級 PCA + KMeans + OneHotEncoding 分析
+
+
+#### (1)判斷最佳分群值
+
+![newplot (15)](https://hackmd.io/_uploads/S1Ws3Ji7Jg.png)
+根據手肘法則，我們應該選擇折彎點，即誤差平方和開始減少趨勢變緩的位置。從圖中來看，折彎點大約是在3群，因為從 3 開始，誤差平方和的下降幅度顯著變小。
+
+
+#### (2)進行 PCA + KMeans + 年級 OneHotEncoding 轉換
+
+![newplot (16)](https://hackmd.io/_uploads/S1bqWlsXkg.png)
+
+<!-- <iframe src="https://data-mining-strong-beignet.netlify.app/3-1-1.html" height="500px" frameborder="0"></iframe> -->
+
+
+#### (3)將分群資料對應回素材總使用時間和年級
+
+
+<iframe src="https://data-mining-strong-beignet.netlify.app/3-1-2.html" height="500px" frameborder="0"></iframe>
+
+| 群集 | 年級 | 最小使用時間(秒) | 第一四分位數(秒) | 中位數使用時間(秒) | 第三四分位數(秒) | 最大使用時間(秒) |
+|---|---|---|---|---|---|---|
+| 0 | 1 | 0.00 | 0.00 | 0.00 | 109.00 | 1166.00 |
+| 0 | 2 | 0.00 | 36.50 | 282.00 | 569.25 | 3072.00 |
+| 0 | 3 | 0.00 | 0.00 | 136.50 | 645.00 | 3388.00 |
+| 0 | 4 | 0.00 | 15.00 | 268.50 | 741.25 | 3613.00 |
+| 0 | 5 | 0.00 | 0.00 | 84.00 | 528.00 | 3652.00 |
+| 0 | 6 | 0.00 | 0.00 | 198.00 | 578.00 | 3699.00 |
+| 1 | 1 | nan | nan | nan | nan | nan |
+| 1 | 2 | 19940.00 | 22350.50 | 27296.50 | 30805.25 | 43584.00 |
+| 1 | 3 | 15943.00 | 16540.00 | 21303.00 | 22166.00 | 22666.00 |
+| 1 | 4 | nan | nan | nan | nan | nan |
+| 1 | 5 | 16014.00 | 16267.00 | 16965.00 | 20690.00 | 23892.00 |
+| 1 | 6 | 14992.00 | 16713.00 | 18434.00 | 20636.50 | 22839.00 |
+| 2 | 1 | nan | nan | nan | nan | nan |
+| 2 | 2 | 4186.00 | 4549.00 | 4912.00 | 6015.50 | 7119.00 |
+| 2 | 3 | 3860.00 | 5159.00 | 7385.00 | 11060.00 | 14548.00 |
+| 2 | 4 | 3775.00 | 4013.50 | 4250.50 | 5042.50 | 7868.00 |
+| 2 | 5 | 3813.00 | 5152.75 | 7030.50 | 10121.75 | 14615.00 |
+| 2 | 6 | 3795.00 | 4876.25 | 6003.00 | 8384.25 | 13841.00 |
+
+群集0的學生為中度學習表現的群集，群集1的學生為高度學習表現的群集，群集2的學生為低度學習表現的群集。以下分析可以歸納不同學習模式與不同年級學生參與的課程，進而找出合適的共學課程。
+
+
+#### (4)不同學習分群下合適的共學課程
+
+| 群集 | 參與年級 | 共同參與的課程 |
+|------|----------|----------------|
+| 群集0 | 5, 6 | 112下503國語, 112-2 Fish and Chips 炸魚薯條, 112下 Where are you going?, 🏆112下學期-新北市國小【高年級】學習扶助自我挑戰超能賽, Where are you?, 憲明國小 校歌, G5 篩選測驗練習(2023) |
+| 群集0 | 4, 6 | 成語故事 - 典故由來2 |
+| 群集0 | 2, 3, 4, 5 | 學習吧－節慶英文故事館（暑假篇）, 閱讀寫作齊步走【小壁虎老師】 |
+| 群集0 | 3, 4, 5 | 課文朗讀高手, 成語故事 - 典故由來１, 英文初級閱讀, 萬富國小讀報黃金屋~有獎徵答 |
+| 群集0 | 1, 2, 3, 4, 5, 6 | 成語故事 - 從典故到生活, 「做伙來」讀課文   |
+| 群集0 | 3, 5 | 國語日報 - 讀報課程【週一~週五更新】（文章授權：國語日報社）, (112學年) 真平版─國小閩語【三下】, 🏆112下學期-新北市國小【中年級】學習扶助自我挑戰超能賽 |
+| 群集0 | 4, 5, 6 | AI程式課程（創造栗）, 2024線上寒假作業（4-6年級）, 水保小教室- 呼叫水保隊長, 英語初級閱讀【博幼基金會授權】 |
+| 群集0 | 2, 3, 5 | 小壁虎老師的 "閱讀認證" |
+| 群集0 | 3, 6 | 國語, 【🌟NEW】文化資產好簡單—從生活中看見文化資產 |
+| 群集0 | 3, 4, 6 | 113 reading, 生活中常見的英語單字 |
+| 群集0 | 3, 4, 5, 6 | 節慶英語故事－聽故事學英語, 唐詩精選（五言、七言絕句） |
+| 群集0 | 2, 3 | 閱讀好好玩之國語日報文章 |
+| 群集0 | 2, 3, 4, 5, 6 | 唐詩朗誦大挑戰, 這週世界發生了什麼？（TVBS 合作課程）, 動物星球頻道－動物檢定, 學習吧－節慶英文故事館  |
+| 群集0 | 4, 5 | 寫作指導(國語日報) -小壁虎, 112EEG英語朗讀比賽, 學習扶助教材～教師教學專用課程（四年級） - 複製 |
+| 群集0 | 1, 3, 4, 5 | 水土保持好好玩 |
+| 群集0 | 3, 4 | 國語文教材（三年級）學習扶助教材 |
+| 群集1 | 2, 5 | 成語故事 - 從典故到生活 |
+| 群集2 | 5, 6 | 閱讀寫作齊步走【小壁虎老師】 |
+| 群集2 | 3, 4, 5, 6 | 「做伙來」讀課文  , 學習吧－節慶英文故事館 |
+| 群集2 | 3, 5 | 成語故事 - 典故由來3, AI程式課程（創造栗） |
+| 群集2 | 2, 3, 5 | 唐詩精選（五言、七言絕句） |
+| 群集2 | 4, 6 | 112下 Where are you going?, Where are you? |
+| 群集2 | 4, 5 | 國語日報 - 讀報課程【週一~週五更新】（文章授權：國語日報社） |
+| 群集2 | 3, 6 | 113 reading |
+
+<br/>
+
+### （四）不同性別 PCA + KMeans + OneHotEncoding 分析
+
+#### (1)判斷最佳分群值
+
+![newplot (18)](https://hackmd.io/_uploads/HyiyHlsmkl.png)
+根據手肘法則，我們應該選擇折彎點，即誤差平方和開始減少趨勢變緩的位置。從圖中來看，折彎點大約是在3群，因為從 3 開始，誤差平方和的下降幅度顯著變小。
+
+#### (2)進行 PCA + KMeans + 性別 OneHotEncoding 轉換
+![newplot (19)](https://hackmd.io/_uploads/r1w9rgoXye.png)
+
+#### (3)將分群資料對應回素材總使用時間和性別
+<!-- ![newplot (20)](https://hackmd.io/_uploads/SkBCSgimke.png) -->
+
+<iframe src="https://data-mining-strong-beignet.netlify.app/4-1-2.html" height="500px" frameborder="0"></iframe>
+
+| 群集 | 生理性別 | 最小使用時間(秒) | 第一四分位數(秒) | 中位數(秒) | 第三四分位數(秒) | 最大使用時間(秒) | 總使用時間(秒) |
+|---|---|---|---|---|---|---|---|
+| 0 | 生理女 | 0.0 | 1053.5 | 2549.0 | 4742.0 | 30556.0 | 1441157.0 |
+| 0 | 生理男 | 0.0 | 986.0 | 2326.0 | 4116.0 | 24020.0 | 837624.0 |
+| 1 | 生理男 | 0.0 | 0.0 | 128.0 | 602.0 | 57466.0 | 2030775.0 |
+| 1 | 生理女 | 0.0 | 0.0 | 71.0 | 533.25 | 44677.0 | 1844454.0 |
+| 2 | 生理女 | 0.0 | 2649.0 | 9624.0 | 19080.0 | 32389.0 | 746411.0 |
+| 2 | 生理男 | 0.0 | 3482.75 | 10348.0 | 14856.75 | 27731.0 | 436273.0 |
+
+<br/>
+
+群集0的學生為中度學習表現的群集，群集1的學生為低度學習表現的群集，群集2的學生為高度學習表現的群集。以下分析能知道這些群集偏好的課程，以此來得知不同學行為下的課程需求為何。
+
+#### (4)每個群集的課程使用時間排行榜
+
+
+群集 0 - 共同課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集0 | 「做伙來」讀課文   | 共同 | 269593.00 | 前三名 |
+| 群集0 | 112憲明五忠(下) | 共同 | 262036.00 | 前三名 |
+| 群集0 | 利澤118五孝下 | 共同 | 180419.00 | 前三名 |
+| 群集0 | 玉田4下國語課文朗讀 | 共同 | 193.00 | 後三名 |
+| 群集0 | 世界時事閱讀 | 共同 | 166.00 | 後三名 |
+| 群集0 | 【兒童節活動】異口「童」聲 | 共同 | 145.00 | 後三名 |
+
+<br/>
+
+群集 0 - 生理女 性別課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集0 | 112憲明五忠(下) | 生理女 | 194440.00 | 前三名 |
+| 群集0 | 利澤118五孝下 | 生理女 | 180419.00 | 前三名 |
+| 群集0 | 「做伙來」讀課文   | 生理女 | 155495.00 | 前三名 |
+| 群集0 | 世界時事閱讀 | 生理女 | 166.00 | 後三名 |
+| 群集0 | 【兒童節活動】異口「童」聲 | 生理女 | 145.00 | 後三名 |
+| 群集0 | 五下社會 | 生理女 | 87.00 | 後三名 |
+
+<br/>
+
+群集 0 - 生理男 性別課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集0 | 「做伙來」讀課文   | 生理男 | 114098.00 | 前三名 |
+| 群集0 | 112憲明五忠(下) | 生理男 | 67596.00 | 前三名 |
+| 群集0 | 112 學年 六年級下學期 | 生理男 | 58402.00 | 前三名 |
+| 群集0 | 112下 Where are you going? | 生理男 | 2756.00 | 後三名 |
+| 群集0 | 【二孝來上課】112學年度下學期~🤗 溫弟老師~ | 生理男 | 2676.00 | 後三名 |
+| 群集0 | 學習吧－節慶英文故事館（暑假篇） | 生理男 | 1715.00 | 後三名 |
+
+
+<br/>
+
+群集 1 - 共同課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集1 | 「做伙來」讀課文   | 共同 | 561829.00 | 前三名 |
+| 群集1 | 利澤118五孝下 | 共同 | 424566.00 | 前三名 |
+| 群集1 | 112憲明五忠(下) | 共同 | 334329.00 | 前三名 |
+| 群集1 | 防衛型運動-動物拳 | 共同 | 1.00 | 後三名 |
+| 群集1 | 翰林自然六下2-4齒輪鍊條複習 | 共同 | 1.00 | 後三名 |
+| 群集1 | 知穎老師-112年陶笛 | 共同 | 1.00 | 後三名 |
+
+<br/>
+
+群集 1 - 生理男 性別課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集1 | 「做伙來」讀課文   | 生理男 | 306797.00 | 前三名 |
+| 群集1 | 利澤118五孝下 | 生理男 | 273719.00 | 前三名 |
+| 群集1 | 112憲明五忠(下) | 生理男 | 244785.00 | 前三名 |
+| 群集1 | (110學年)翰林版─國小國語【四下】 | 生理男 | 4.00 | 後三名 |
+| 群集1 | (112學年) 翰林版─國小社會【六下】 | 生理男 | 1.00 | 後三名 |
+| 群集1 | 翰林自然六下2-4齒輪鍊條複習 | 生理男 | 1.00 | 後三名 |
+
+<br/>
+
+群集 1 - 生理女 性別課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集1 | 「做伙來」讀課文   | 生理女 | 255032.00 | 前三名 |
+| 群集1 | 利澤118五孝下 | 生理女 | 150847.00 | 前三名 |
+| 群集1 | ※ Here We Go 3 (四年級下學期🤗 溫弟老師）  | 生理女 | 120158.00 | 前三名 |
+| 群集1 | (112學年) 翰林版─國小社會【六下】 | 生理女 | 2.00 | 後三名 |
+| 群集1 | 防衛型運動-動物拳 | 生理女 | 1.00 | 後三名 |
+| 群集1 | 知穎老師-112年陶笛 | 生理女 | 1.00 | 後三名 |
+
+<br/>
+
+群集 2 - 共同課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集2 | 二孝國語課文朗讀作業 | 共同 | 520987.00 | 前三名 |
+| 群集2 | 【二孝來上課】112學年度下學期~🤗 溫弟老師~ | 共同 | 200777.00 | 前三名 |
+| 群集2 | 112憲明五忠(下) | 共同 | 70355.00 | 前三名 |
+| 群集2 | 五下社會 | 共同 | 8866.00 | 後三名 |
+| 群集2 | 3年級上學期 自然科學 | 共同 | 909.00 | 後三名 |
+| 群集2 | English G6  | 共同 | 387.00 | 後三名 |
+
+<br/>
+
+群集 2 - 生理女 性別課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集2 | 二孝國語課文朗讀作業 | 生理女 | 330256.00 | 前三名 |
+| 群集2 | 【二孝來上課】112學年度下學期~🤗 溫弟老師~ | 生理女 | 122815.00 | 前三名 |
+| 群集2 | 112憲明五忠(下) | 生理女 | 70355.00 | 前三名 |
+| 群集2 | 3年級上學期 自然科學 | 生理女 | 909.00 | 後三名 |
+| 群集2 | English G6  | 生理女 | 387.00 | 後三名 |
+| 群集2 | 「做伙來」讀課文   | 生理女 | 341.00 | 後三名 |
+
+<br/>
+
+群集 2 - 生理男 性別課程使用時間排行榜:
+| 群集 | 課程名稱 | 參與性別 | 使用時間(秒數) | 排名 |
+|------|----------|----------|----------------|------|
+| 群集2 | 二孝國語課文朗讀作業 | 生理男 | 190731.00 | 前三名 |
+| 群集2 | 【二孝來上課】112學年度下學期~🤗 溫弟老師~ | 生理男 | 77962.00 | 前三名 |
+| 群集2 | 學習吧－節慶英文故事館  | 生理男 | 37170.00 | 前三名 |
+| 群集2 | 「做伙來」讀課文   | 生理男 | 14946.00 | 後三名 |
+| 群集2 | (112學年) 翰林版─國小國語【五下】  - 複製 | 生理男 | 10079.00 | 後三名 |
+| 群集2 | 五下社會 | 生理男 | 8866.00 | 後三名 |
+
+
+<br/>
+
+## 六、總結
+
+
+本研究以大數據分析工具深入探討學生在不同課程、年級與性別背景下的學習行為與表現，結合熱力圖分析、主成分分析（PCA）及 KMeans 分群方法，挖掘學習群體特徵與共學課程潛力，得出以下總結：
+
+**1.課程使用特徵與學習模式**
+
+* 高使用課程如「『做伙來』讀課文」與「忠於朗讀」展現出素材使用時間的明顯集中，學生對影片與語音作業有高度參與。這顯示具有明確學習目標與穩定結構的課程設計能有效提升參與度。
+* 不同課程素材使用時間的分布差異反映學生對學習形式的多元需求與偏好，進一步凸顯平台的適應性與資源多樣性。
+
+**2.年級與性別的學習差異**
+
+* 年級層面：高年級學生在測驗與語音作業等素材上的使用時間較長，可能與其學習需求或能力發展相關。
+* 性別層面：女性學生在多數素材類型中的平均使用時間高於男性，或顯示學習投入與方式的性別差異。
+
+**學習分群與共學機會**
+
+* PCA 與 KMeans 分群將學生分為高、中、低學習表現群體。高表現群體在素材使用時間與參與度上顯著優於其他群體，而低表現群體則使用行為較少。
+* 部分課程如「成語故事」與「『做伙來』讀課文」吸引跨年級與跨群體參與，展現作為共學課程的潛力。
+
+**教學與課程設計建議**
+
+* 針對性設計：根據學生對素材的偏好設計吸引特定目標群體的課程，如影片導向學習或語音作業核心課程。
+* 促進共學：在共學課程中引入互動機制，增強學生間的合作與交流。
+* 支援低表現群體：提供引導式學習資源或激勵措施，提升低表現群體的參與度與學習成效。
+
+
+綜上所述，透過學習數據的分析與洞察，我們能有效優化課程設計與教學策略，進一步促進學生全體的學習成效與參與感。
+
+
+<br/>
+
+## 七、未來期許
+我們的目標是透過更細緻的數據蒐集與分析，讓我們能得知學生的學習成效與平台學習的關係。為此，我們期望能夠獲取與學生學習行為相關的各項細節資料，例如：
+
+1. **學習行為數據**
+
+* 暫停與播放行為：分析學生在學習過程中暫停與播放影片的頻率與時機點，進一步了解學習重點與可能的困難點。
+* 開始作答時間：記錄學生在練習題或測驗中的作答起始時間，推斷其理解與反應速度。
+
+
+
+2. **整體學習表現數據**
+
+* 包括完成率、正確率、反覆觀看次數等，以多維度呈現學生的學習軌跡。
+
+
+3. **數據整合與分析**
+
+* 將蒐集到的行為數據與現有分析數據進行對比與交叉分析，找出學生學習行為與成效之間的關聯，描繪出最真實的學習表現。
+
+
+透過這些分析，我們期望學習吧平台能更加貼近使用者需求，特別是協助小學生等主要群體有效實現其學習目標。
+
+<br/>
+
+## 八、資料來源
+
+Google Colab 連結：https://colab.research.google.com/drive/1F_BL57_sJIQ3HFpQHYeEGzLkhNwxMjuZ?usp=sharing
